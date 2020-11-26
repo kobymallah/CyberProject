@@ -2,7 +2,7 @@ import json
 import math
 import numpy
 from event import Event
-from environment import Environment
+from dynamic_environment import DynamicEnvironment
 from a_star import a_star
 
 I = ['None', 'LocalCleartext', 'LocalEncrypted', 'Remote']
@@ -49,7 +49,7 @@ class ResourcesAllocator:
         self.shot_down = []
 
         self.load()
-    
+
     def load(self):
         """
         Loads the data from the data file and assigns the values to the variables accordingly
@@ -299,7 +299,7 @@ class ResourcesAllocator:
 
         :return: the list of transfers, each element is a tuple in the form: (from_vehicle, to_vehicle, the_key's_asset)
         """
-        # env = Environment(self.V, len(self.A), self.Comm, self.shot_down)
+        # env = DynamicEnvironment(self.V, len(self.A), self.Comm, self.shot_down)
         #
         # path = a_star(env, self.previous_keys_positions, self.current_keys_positions)
         #

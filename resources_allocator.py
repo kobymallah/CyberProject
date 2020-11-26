@@ -18,92 +18,81 @@ class ResourcesAllocator:
     
     def __init__(self, data_file: str):
         """
-        Saves the data file path, initializes an empty MIP model and defines the required varibles
+        Saves the data file path, initializes an empty MIP model and defines the required variables
 
         :param data_file: the path to the file that contains the data for the model
         """
-        # self.data_file = data_file
-        # self.model = Model('ResourcesAllocator')
-        # self.model.verbose = 0
-        #
-        # self.V = []
-        # self.Likelihood = []
-        # self.V_cpu = []
-        # self.V_mem = []
-        #
-        # self.A = []
-        # self.Sensitivity = []
-        # self.A_cpu = []
-        # self.A_mem = []
-        # self.A_net = []
-        #
-        # self.K = None
-        #
-        # self.Comm = {}
-        # self.Req = {}
-        #
-        # self.X = None
-        # self.F = {}
-        #
-        # self.MaxComm = None
-        # self.r = None
-        #
-        # self.assets_instances = None
-        # self.keys_instances = None
-        #
-        # self.previous_keys_positions = None
-        # self.current_keys_positions = None
-        # self.shot_down = []
-        #
-        # self.load()
-        #
-        # self.build_model()
-        pass
+        self.data_file = data_file
+
+        self.V = []
+        self.Likelihood = []
+        self.V_cpu = []
+        self.V_mem = []
+
+        self.A = []
+        self.Sensitivity = []
+        self.A_cpu = []
+        self.A_mem = []
+        self.A_net = []
+
+        self.K = None
+
+        self.Comm = {}
+        self.Req = {}
+
+        self.X = None
+        self.F = {}
+
+        self.MaxComm = None
+        self.r = None
+
+        self.shot_down = []
+
+        self.load()
     
     def load(self):
         """
         Loads the data from the data file and assigns the values to the variables accordingly
         """
-        # with open(self.data_file) as data:
-        #     data_json = json.load(data)
-        #
-        #     vehicles = data_json['Vehicles']
-        #     for v in vehicles:
-        #         self.V.append(v['name'])
-        #         self.Likelihood.append(v['likelihood'])
-        #         self.V_cpu.append(v['cpu'])
-        #         self.V_mem.append(v['mem'])
-        #         self.Req[v['name']] = []
-        #         self.Comm[v['name']] = []
-        #
-        #     assets = data_json['Assets']
-        #     for a in assets:
-        #         self.A.append(a['name'])
-        #         self.Sensitivity.append(a['sensitivity'])
-        #         self.A_cpu.append(a['cpu'])
-        #         self.A_mem.append(a['mem'])
-        #         self.A_net.append(a['net'])
-        #
-        #     communication = data_json['Communication']
-        #     for c in communication:
-        #         self.Comm[c[0]].append(c[1])
-        #         self.Comm[c[1]].append(c[0])
-        #
-        #     requests = data_json['Requests']
-        #     for r in requests:
-        #         v = list(r.keys())[0]
-        #         a = r[v]
-        #         self.Req[v].append(a)
-        #
-        #     factors = data_json['Factors']
-        #     for f in factors:
-        #         a = list(f.keys())[0]
-        #         a_index = [a1 for a1 in range(len(self.A))if self.A[a1] == a][0]
-        #         self.F[a_index] = f[a]
-        #
-        #     self.MaxComm = data_json['MaxComm']
-        #     self.r = data_json['r']
-        pass
+        with open(self.data_file) as data:
+            data_json = json.load(data)
+
+            vehicles = data_json['Vehicles']
+            for v in vehicles:
+                self.V.append(v['name'])
+                self.Likelihood.append(v['likelihood'])
+                self.V_cpu.append(v['cpu'])
+                self.V_mem.append(v['mem'])
+                self.Req[v['name']] = []
+                self.Comm[v['name']] = []
+
+            assets = data_json['Assets']
+            for a in assets:
+                self.A.append(a['name'])
+                self.Sensitivity.append(a['sensitivity'])
+                self.A_cpu.append(a['cpu'])
+                self.A_mem.append(a['mem'])
+                self.A_net.append(a['net'])
+
+            communication = data_json['Communication']
+            for c in communication:
+                self.Comm[c[0]].append(c[1])
+                self.Comm[c[1]].append(c[0])
+
+            requests = data_json['Requests']
+            for r in requests:
+                v = list(r.keys())[0]
+                a = r[v]
+                self.Req[v].append(a)
+
+            factors = data_json['Factors']
+            for f in factors:
+                a = list(f.keys())[0]
+                a_index = [a1 for a1 in range(len(self.A))if self.A[a1] == a][0]
+                self.F[a_index] = f[a]
+
+            self.MaxComm = data_json['MaxComm']
+            self.r = data_json['r']
                 
     def assignment_after_event(self, event: Event):
         """
@@ -111,38 +100,37 @@ class ResourcesAllocator:
 
         :param event: the event that happened during the mission
         """
-        # if event.type == Event.LOST_COMMUNICATION:
-        #     v1, v2 = event.entities[0], event.entities[1]
-        #     self.Comm[v1].remove(v2)
-        #     self.Comm[v2].remove(v1)
-        # elif event.type == Event.RISK_CHANGE:
-        #     v = event.entities[0]
-        #     v_index = self.V.index(event.entities[0])
-        #     self.Likelihood[v_index] = event.entities_attributes[v]['likelihood']
-        # elif event.type == Event.DAMAGED:
-        #     v = event.entities[0]
-        #     v_index = self.V.index(event.entities[0])
-        #     self.Likelihood[v_index] = math.inf
-        #     self.Req.pop(v)
-        # elif event.type == Event.SHOT_DOWN:
-        #     v = event.entities[0]
-        #     v_index = self.V.index(event.entities[0])
-        #     self.shot_down.append(v_index)
-        #     # del self.V[v_index]
-        #     # del self.V_cpu[v_index]
-        #     # del self.V_mem[v_index]
-        #     self.Comm.pop(v)
-        #     [self.Comm[v_tag].remove(v) for v_tag in self.Comm.keys()]
-        #     for a in self.A:
-        #         if v in self.assets_instances[a]:
-        #             self.assets_instances[a].remove(v)
-        #         if v in self.keys_instances[a]:
-        #             self.keys_instances[a].remove(v)
-        # else:
-        #     print(f'Illegal event type: {event.type}')
-        # self.build_model_in_mission()
-        # self.solve()
-        pass
+        if event.type == Event.LOST_COMMUNICATION:
+            v1, v2 = event.entities[0], event.entities[1]
+            self.Comm[v1].remove(v2)
+            self.Comm[v2].remove(v1)
+        elif event.type == Event.RISK_CHANGE:
+            v = event.entities[0]
+            v_index = self.V.index(event.entities[0])
+            self.Likelihood[v_index] = event.entities_attributes[v]['likelihood']
+        elif event.type == Event.DAMAGED:
+            v = event.entities[0]
+            v_index = self.V.index(event.entities[0])
+            self.Likelihood[v_index] = math.inf
+            self.Req.pop(v)
+        elif event.type == Event.SHOT_DOWN:
+            v = event.entities[0]
+            v_index = self.V.index(event.entities[0])
+            self.shot_down.append(v_index)
+            # del self.V[v_index]
+            # del self.V_cpu[v_index]
+            # del self.V_mem[v_index]
+            self.Comm.pop(v)
+            [self.Comm[v_tag].remove(v) for v_tag in self.Comm.keys()]
+            for a in self.A:
+                if v in self.assets_instances[a]:
+                    self.assets_instances[a].remove(v)
+                if v in self.keys_instances[a]:
+                    self.keys_instances[a].remove(v)
+        else:
+            print(f'Illegal event type: {event.type}')
+        self.build_model_in_mission()
+        self.solve()
     
     def build_model(self):
         """
